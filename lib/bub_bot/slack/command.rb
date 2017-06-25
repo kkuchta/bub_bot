@@ -4,12 +4,16 @@ class BubBot::Slack::Command
   end
 
   def self.aliases
-    binding.pry
-    puts 'here'
+    # Guess the command name from the class name
+    [self.name.demodulize.downcase]
   end
 
   def initialize(options)
+    @options = options
     puts "initialized a command"
   end
 
+  def run
+    raise "Not implemented"
+  end
 end

@@ -6,16 +6,16 @@ Dir[File.dirname(__FILE__) + '/commands/*.rb'].each {|file| require file }
 
 class BubBot::Slack::CommandParser
   def self.get_command(string_input)
-    puts "Parsing #{stringInput}"
+    puts "Parsing #{string_input}"
     puts "options: #{command_classes}"
     command = string_input.split(' ').first
 
     if command
-      command_classes.each do |command_class|
+      command_classes.find do |command_class|
         command_class.can_handle?(command)
       end
     else
-
+      nil
     end
   end
 

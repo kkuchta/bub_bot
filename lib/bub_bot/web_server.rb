@@ -5,33 +5,33 @@ end
 
 class BubBot::WebServer
   def call(env)
-    puts 'here'
+    puts 'got something'
     request = Rack::Request.new(env)
 
     # For easily checking if the server's up
     if request.path == '/' && request.get?
       return [200, {}, ['ok']]
+    elsif request.path == '/' && request.post?
+      params = parse_params(request)
+      return [200, {}, [params[:challenge]]] if params[:challenge]
 
-    elsif request.path == '/slack_hook' && request.post?
-      params = Rack::Utils
-        .parse_nested_query(request.body.read)
-        .with_indifferent_access
       # command = first_arg
       # klass = find_command_class(command)
       # klass.new(request).handle
       #
       #SlackInterface.new.handle_slack_webhook(request.body.read)
+      event = params[:event]
+      binding.pry
 
-      # Strip off the 'bub'
-      command_text = params['text']
-        .sub(params['trigger_word'], '')
-        .strip
+      command_text = event[:text].strip
 
       command = BubBot::Slack::CommandParser.get_command(command_text)
 
       puts "Running command #{command}"
 
-      #command.new(params.merge(command_text: command_text)).run
+      if command
+        command.new(event.merge(command_text: command_text)).run
+      end
 
       return [200, {}, []]
 
@@ -48,4 +48,9 @@ class BubBot::WebServer
   end
 
   private
+
+  def parse_params(request)
+    JSON.parse(request.body.read)
+      .with_indifferent_access
+  end
 end
