@@ -15,22 +15,20 @@ class BubBot::WebServer
       params = parse_params(request)
       return [200, {}, [params[:challenge]]] if params[:challenge]
 
-      # command = first_arg
-      # klass = find_command_class(command)
-      # klass.new(request).handle
-      #
-      #SlackInterface.new.handle_slack_webhook(request.body.read)
       event = params[:event]
-      binding.pry
 
-      command_text = event[:text].strip
+      # Skip messages from bots
+      if event[:subtype] == 'bot_message'
+        return [200, {}, []]
+      end
 
-      command = BubBot::Slack::CommandParser.get_command(command_text)
+
+      command = BubBot::Slack::CommandParser.get_command(event[:text])
 
       puts "Running command #{command}"
 
       if command
-        command.new(event.merge(command_text: command_text)).run
+        command.new(event).run
       end
 
       return [200, {}, []]

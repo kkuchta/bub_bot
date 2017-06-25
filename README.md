@@ -9,6 +9,11 @@ Slack setup:
 - Add a bot user
 - Add an event subscription
   - Use the *bot event* for messages.channel
+- Add an incoming webhook
 <!--- Add event subscription-->
   <!--- Enter hostname (verification should happen automatically now)-->
   <!--- Add messages.channel permission-->
+
+TODO: figure out how to post to the slack web api.  I really only have the bot and non-bot oauth tokens.  What do I do with those?  They're install-specific.
+
+Ok, never mind- let's just use incoming webhooks for that.  They're install-specific too.
