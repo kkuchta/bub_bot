@@ -1,3 +1,5 @@
+require 'bub_bot/slack/command_parser'
+
 class BubError < StandardError
 end
 
@@ -11,13 +13,26 @@ class BubBot::WebServer
       return [200, {}, ['ok']]
 
     elsif request.path == '/slack_hook' && request.post?
-      params = Rack::Utils.parse_nested_query(request.body.read)
+      params = Rack::Utils
+        .parse_nested_query(request.body.read)
+        .with_indifferent_access
       # command = first_arg
       # klass = find_command_class(command)
       # klass.new(request).handle
       #
       #SlackInterface.new.handle_slack_webhook(request.body.read)
-      puts "got request.body.read: #{request.body.read}"
+
+      # Strip off the 'bub'
+      command_text = params['text']
+        .sub(params['trigger_word'], '')
+        .strip
+
+      command = BubBot::Slack::CommandParser.get_command(command_text)
+
+      puts "Running command #{command}"
+
+      #command.new(params.merge(command_text: command_text)).run
+
       return [200, {}, []]
 
     #elsif request.path == '/heroku_hook' && request.post?

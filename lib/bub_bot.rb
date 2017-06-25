@@ -1,9 +1,12 @@
 require 'rack'
-require "bub_bot/version"
-require "bub_bot/web_server"
-require "bub_bot/configuration"
-require "bub_bot/cli"
-require "pry-byebug"
+require 'bub_bot/version'
+require 'bub_bot/web_server'
+require 'bub_bot/configuration'
+require 'bub_bot/cli'
+require 'pry-byebug'
+require 'active_support'
+require 'active_support/core_ext'
+
 
 module BubBot
   class << self
@@ -17,7 +20,7 @@ module BubBot
       puts "Booting BubBot, slack_token = #{BubBot.configuration.slack_token}"
       Thread.new do
         loop do
-          puts "Checking for servers to shutdown"
+          #puts "Checking for servers to shutdown"
           # TODO: actually do that ^
           sleep 10# * 60
         end
