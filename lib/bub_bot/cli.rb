@@ -9,10 +9,7 @@ class BubBot::CLI
   end
 
   def start
-    unless check_usage
-      print_usage
-      return
-    end
+    print_usage && return unless check_usage
 
     configure_from_file(@filename)
 
@@ -25,8 +22,9 @@ class BubBot::CLI
     file_data = YAML.load_file(filename)
 
     BubBot.configure do |config|
-      config.slack_token = file_data['slack_token']
-      config.slack_url = file_data['slack_url']
+      BubBot::Configuration::OPTIONS.each do |option_name|
+        config.public_send((option_name.to_s + '=').to_sym, file_data[option_name.to_s])
+      end
     end
   end
 

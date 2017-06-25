@@ -1,15 +1,16 @@
 require 'rack'
 require "bub_bot/version"
-require "bub_bot/rack_handler"
+require "bub_bot/web_server"
 require "bub_bot/configuration"
 require "bub_bot/cli"
+require "pry-byebug"
 
 module BubBot
   class << self
     attr_accessor :configuration
     # From a config.ru file you can do `run BubBot`.
     def call(env)
-      RackHandler.new.call(env)
+      WebServer.new.call(env)
     end
 
     def start
@@ -21,7 +22,8 @@ module BubBot
           sleep 10# * 60
         end
       end
-      Rack::Handler::WEBrick.run BubBot
+
+      Rack::Handler::Thin.run(BubBot, BubBot.configuration.rack_options_hash)
     end
 
     def configure

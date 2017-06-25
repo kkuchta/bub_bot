@@ -1,16 +1,25 @@
 class BubError < StandardError
 end
 
-class BubBot::RackHandler
+class BubBot::WebServer
   def call(env)
+    puts 'here'
     request = Rack::Request.new(env)
 
+    # For easily checking if the server's up
     if request.path == '/' && request.get?
       return [200, {}, ['ok']]
+
     elsif request.path == '/slack_hook' && request.post?
+      params = Rack::Utils.parse_nested_query(request.body.read)
+      # command = first_arg
+      # klass = find_command_class(command)
+      # klass.new(request).handle
+      #
       #SlackInterface.new.handle_slack_webhook(request.body.read)
       puts "got request.body.read: #{request.body.read}"
       return [200, {}, []]
+
     #elsif request.path == '/heroku_hook' && request.post?
       #HerokuInterface.new.handle_heroku_webhook(request.body.read)
       #return [200, {}, []]
@@ -22,4 +31,6 @@ class BubBot::RackHandler
     puts "Err: #{e.message}"
     return [400, {}, [e.message]]
   end
+
+  private
 end
