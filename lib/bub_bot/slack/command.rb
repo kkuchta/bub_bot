@@ -1,4 +1,3 @@
-require 'faraday'
 class BubBot::Slack::Command
   def self.can_handle?(command)
     aliases.include?(command)
@@ -18,14 +17,7 @@ class BubBot::Slack::Command
     raise "Not implemented"
   end
 
-  def send_message(message)
-    #BubBot.configuration.slack_url
-    body = {
-      text: message,
-      username: 'bub'
-    }
-    Faraday.post(BubBot.configuration.slack_url, body.to_json)
-
-    puts 'here'
+  def respond(options)
+    BubBot::Slack::Response.new(options)
   end
 end

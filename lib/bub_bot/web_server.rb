@@ -1,4 +1,6 @@
 require 'bub_bot/slack/command_parser'
+require 'bub_bot/slack/response'
+require 'faraday'
 
 class BubError < StandardError
 end
@@ -22,14 +24,15 @@ class BubBot::WebServer
         return [200, {}, []]
       end
 
-
       command = BubBot::Slack::CommandParser.get_command(event[:text])
 
       puts "Running command #{command}"
 
       if command
-        command.new(event).run
+        response = command.new(event).run
       end
+
+      response.send
 
       return [200, {}, []]
 

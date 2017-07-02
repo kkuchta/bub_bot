@@ -14,6 +14,9 @@ Slack setup:
   <!--- Enter hostname (verification should happen automatically now)-->
   <!--- Add messages.channel permission-->
 
-TODO: figure out how to post to the slack web api.  I really only have the bot and non-bot oauth tokens.  What do I do with those?  They're install-specific.
-
-Ok, never mind- let's just use incoming webhooks for that.  They're install-specific too.
+Brain dump for the next time I pick this up:
+- I just got messages going both ways (try out the echo command to make sure things work)
+- Next up is implementing more commands
+  - What do I use for a data store—a db again?  Ugh.
+  - Screw that, let's use redis (if heroku allows it for free)
+  - It does!
