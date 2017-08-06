@@ -6,6 +6,7 @@ class BubBot::Configuration
   BUB_BOT_OPTIONS = %i(
     slack_token
     slack_url
+    servers
   )
 
   OPTIONS = RACK_OPTIONS + BUB_BOT_OPTIONS

@@ -1,3 +1,5 @@
+require 'bub_bot/server_manager.rb'
+
 class BubBot::Slack::Command
   def self.can_handle?(command)
     aliases.include?(command)
@@ -14,10 +16,15 @@ class BubBot::Slack::Command
   end
 
   def run
-    raise "Not implemented"
+    name = self.class.name
+    raise "Your command #{name} needs to implement 'run'"
   end
 
   def respond(options)
     BubBot::Slack::Response.new(options)
+  end
+
+  def servers
+    @servers ||= BubBot::ServerManager.new
   end
 end

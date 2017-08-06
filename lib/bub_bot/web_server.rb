@@ -32,7 +32,7 @@ class BubBot::WebServer
         response = command.new(event).run
       end
 
-      response.send
+      response.deliver
 
       return [200, {}, []]
 

@@ -6,7 +6,7 @@ class BubBot::Slack::Response
     @text = options.is_a?(String) ? options : options[:text]
   end
 
-  def send
+  def deliver
     body = {
       text: text,
       username: 'bub'

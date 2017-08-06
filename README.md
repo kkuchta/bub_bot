@@ -20,3 +20,6 @@ Brain dump for the next time I pick this up:
   - What do I use for a data store—a db again?  Ugh.
   - Screw that, let's use redis (if heroku allows it for free)
   - It does!
+- Ok, I started on the Take command.  Got a redis connection working (probably).  Run redis-server to start that locally.
+- Figuring out how I want to do the ServerManager.  Should that be responsible
+  for deploying, or just claiming?  Probably the latter, right?
