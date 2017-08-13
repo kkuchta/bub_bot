@@ -3,6 +3,7 @@
 These are just notes to myself.  //TODO: rewrite this section so it's useful to people who are not me.
 
 Use ec2tunnel alias to set up a tunnel (it's already rigged up to slack on the ktest team)
+`bundle exec bin/bub_bot test_config.yml`
 
 Slack setup:
 - Creat an app
@@ -13,13 +14,10 @@ Slack setup:
 <!--- Add event subscription-->
   <!--- Enter hostname (verification should happen automatically now)-->
   <!--- Add messages.channel permission-->
+- More notes on this in test_config.yml.  Before I ship all this I'll need to test out the slack setup instructions.
 
 Brain dump for the next time I pick this up:
-- I just got messages going both ways (try out the echo command to make sure things work)
-- Next up is implementing more commands
-  - What do I use for a data store—a db again?  Ugh.
-  - Screw that, let's use redis (if heroku allows it for free)
-  - It does!
 - Ok, I started on the Take command.  Got a redis connection working (probably).  Run redis-server to start that locally.
 - Figuring out how I want to do the ServerManager.  Should that be responsible
   for deploying, or just claiming?  Probably the latter, right?
+- Ok, take command works with hardcoded values.  Let's set up the command parsing.

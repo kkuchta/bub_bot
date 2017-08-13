@@ -5,12 +5,11 @@ class BubBot::Slack::Command::Claim < BubBot::Slack::Command
   end
 
   def run
-    respond('takin')
 
     take_options = {
       server_name: server_name,
       duration: duration,
-      user: user
+      user: source_user_name
     }.compact
     # Defaulting should happen here
 
@@ -23,10 +22,6 @@ class BubBot::Slack::Command::Claim < BubBot::Slack::Command
 
   def server_name
     'cannoli' # todo: parse from command
-  end
-
-  def user
-    'kevin' # todo: somehow
   end
 
   def duration

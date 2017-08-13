@@ -1,12 +1,15 @@
 class BubBot::Configuration
+  # Any of these options will be passed on to rack, rather than handled by us.
   RACK_OPTIONS = %i(
     Port
   )
 
+  # These options will be handled by us.
   BUB_BOT_OPTIONS = %i(
     slack_token
     slack_url
     servers
+    bot_oauth_token
   )
 
   OPTIONS = RACK_OPTIONS + BUB_BOT_OPTIONS

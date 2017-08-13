@@ -17,6 +17,8 @@ class BubBot::WebServer
       params = parse_params(request)
       return [200, {}, [params[:challenge]]] if params[:challenge]
 
+
+
       event = params[:event]
 
       # Skip messages from bots

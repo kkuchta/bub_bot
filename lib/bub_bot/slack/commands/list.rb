@@ -9,8 +9,6 @@ class BubBot::Slack::Command::List < BubBot::Slack::Command
   end
 
   def run
-    #respond('listing')
-
     list_strings = servers.list.map do |server, claim|
       if claim['expires_at']
         time_ago = time_ago_in_words(claim['expires_at'])
