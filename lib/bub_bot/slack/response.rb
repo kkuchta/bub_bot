@@ -2,6 +2,7 @@ require 'faraday'
 
 class BubBot::Slack::Response
   attr_accessor :text
+
   def initialize(options)
     @text = options.is_a?(String) ? options : options[:text]
   end

@@ -3,8 +3,11 @@ class BubBot::ServerManager
   ROOT_KEY = 'bub_server_list'.freeze
 
   # Options:
-  # - duration (required)
-  # - server_name (optional)
+  # - duration (1.hour)
+  # - server_name (cannoli)
+  # - username (kevin)
+  #
+  # All options required.  Do your own defaulting, you lazy bum!
   def take(options)
     puts 'takin'
 
@@ -38,6 +41,10 @@ class BubBot::ServerManager
           {}
         end
     end
+  end
+
+  def first_unclaimed
+    list.key(nil)
   end
 
   private

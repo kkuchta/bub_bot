@@ -5,6 +5,11 @@ require 'faraday'
 class BubError < StandardError
 end
 
+# An error that should should result in a user-facing response (and not a non-200
+# http response code)
+class RespondableError < StandardError
+end
+
 class BubBot::WebServer
   def call(env)
     puts 'got something'
@@ -36,10 +41,14 @@ class BubBot::WebServer
       puts "Running command #{command}"
 
       response =
-        if command
-          command.new(event).run
-        else
-          BubBot::Slack::Response.new("unknown command")
+        begin
+          if command
+            command.new(event).run
+          else
+            BubBot::Slack::Response.new("unknown command")
+          end
+        rescue RespondableError => e
+          BubBot::Slack::Response.new(e.message)
         end
 
       response.deliver
