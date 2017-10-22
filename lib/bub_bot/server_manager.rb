@@ -1,6 +1,6 @@
 require 'redis'
 class BubBot::ServerManager
-  ROOT_KEY = 'bub_server_list'
+  ROOT_KEY = 'bub_server_list'.freeze
 
   # Options:
   # - duration (required)
@@ -20,17 +20,24 @@ class BubBot::ServerManager
     puts 'done takin'
   end
 
-  def list
-    all_claims = redis.hgetall(ROOT_KEY)
+  def names
+    known_server_names
+  end
 
-    all_claims
-      .slice(*known_server_names) # Remove old claims
-      .each_with_object({}) do |(server, claim), claim_map|
-        claim = JSON.parse(claim)
-        expires_at = DateTime.parse(claim['expires_at'])
-        claim['expires_at'] = expires_at < Time.now ? nil : expires_at
-        claim_map[server] = claim
-      end
+  def list
+    claims = redis.hgetall(ROOT_KEY).to_h
+
+    known_server_names.each_with_object({}) do |server_name, claim_map|
+      claim_map[server_name] =
+        if claim = claims[server_name]
+          claim_data = JSON.parse(claim)
+          expires_at = DateTime.parse(claim_data['expires_at'])
+          claim_data['expires_at'] = expires_at < Time.now ? nil : expires_at
+          claim_data
+        else
+          {}
+        end
+    end
   end
 
   private
@@ -40,7 +47,7 @@ class BubBot::ServerManager
   end
 
   def redis
-    # TODO pull from config
+    # TODO: pull from config
     @redis ||= Redis.new(url: 'redis://localhost:6379')
   end
 end

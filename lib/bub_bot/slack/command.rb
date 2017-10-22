@@ -41,11 +41,48 @@ class BubBot::Slack::Command
   end
 
   def tokens
-    
+    @tokens ||= @options['text'].split(' ')
   end
 
+  # Takes either a string or some options
   def respond(options)
     BubBot::Slack::Response.new(options)
   end
 
+  # Returns an iterator over the token list that returns nil when out of tokens.
+  #
+  # Eg if the tokens are `aaa bbb ccc`:
+  #
+  # iterator = create_token_iterator
+  # iterator.next # aaa
+  # iterator.next # bbb
+  # iterator.next # ccc
+  # iterator.next # nil
+  #
+  # A good way to use this is for parsing order-agnostic commands:
+  #
+  # iterator = create_token_iterator
+  # while token = iterator.next
+  #   if token == 'bake'
+  #     recipe = iterator.next
+  #     raise "bad recipe" unless %w(bread cookies).include?(recipe)
+  #     bake(iterator.next)
+  #   elsif token == 'order'
+  #     raise 'missing type' unless food_type = iterator.next
+  #     raise 'missing when' unless when = iterator.next
+  #     order(food_type, when)
+  #   end
+  # end
+  def create_token_iterator
+    unsafe_iterator = tokens.each
+
+    return Enumerator.new do |yielder|
+      loop do
+        yielder.yield unsafe_iterator.next
+      end
+      loop do
+        yielder.yield nil
+      end
+    end
+  end
 end

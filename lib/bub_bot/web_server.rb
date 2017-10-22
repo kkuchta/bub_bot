@@ -13,16 +13,21 @@ class BubBot::WebServer
     # For easily checking if the server's up
     if request.path == '/' && request.get?
       return [200, {}, ['ok']]
+
+    # When slack sends us a challenge request
     elsif request.path == '/' && request.post?
       params = parse_params(request)
       return [200, {}, [params[:challenge]]] if params[:challenge]
 
-
-
       event = params[:event]
 
       # Skip messages from bots
-      if event[:subtype] == 'bot_message'
+        
+      return [200, {}, []] if event[:subtype] == 'bot_message'
+
+      # Make sure this is in the form of 'bub foo'
+      unless event[:text].starts_with?(BubBot.configuration.bot_name + ' ')
+        puts "skipping non-bub message"
         return [200, {}, []]
       end
 
@@ -30,9 +35,12 @@ class BubBot::WebServer
 
       puts "Running command #{command}"
 
-      if command
-        response = command.new(event).run
-      end
+      response =
+        if command
+          command.new(event).run
+        else
+          BubBot::Slack::Response.new("unknown command")
+        end
 
       response.deliver
 

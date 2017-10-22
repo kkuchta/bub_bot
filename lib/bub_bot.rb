@@ -11,11 +11,17 @@ require 'active_support/core_ext'
 module BubBot
   class << self
     attr_accessor :configuration
-    # From a config.ru file you can do `run BubBot`.
+    # From a config.ru file you can do `run BubBot`.  TODO: maybe not.  That would
+    # skip the running background thread.
+    #
+    # Handle an individual web request.  You shouldn't call this method directly.
+    # Instead, give BubBot to Rack and let it call this method.
     def call(env)
-      WebServer.new.call(env)
+      (@web_server ||= WebServer.new).call(env)
     end
 
+    # This method starts a listening web server.  Call from the cli or wherever
+    # else you want to kick off a running BubBot process.
     def start
       puts "Booting BubBot, slack_token = #{BubBot.configuration.slack_token}"
       Thread.new do
@@ -26,9 +32,21 @@ module BubBot
         end
       end
 
-      Rack::Handler::Thin.run(BubBot, BubBot.configuration.rack_options_hash)
+      app = Rack::Builder.new do
+        # if development (TODO)
+          use Rack::Reloader
+        # end
+        run BubBot
+      end.to_app
+
+      Rack::Handler::Thin.run(app, BubBot.configuration.rack_options_hash)
     end
 
+    # Used for setting config options:
+    #   BubBot.configure do |config|
+    #     config.bot_name 'lillian'
+    #     config.redis_host 'localhost:6379'
+    #   end
     def configure
       self.configuration ||= Configuration.new
       yield configuration

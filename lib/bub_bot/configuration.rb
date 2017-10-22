@@ -1,3 +1,4 @@
+# TODO: merge with some defaults
 class BubBot::Configuration
   # Any of these options will be passed on to rack, rather than handled by us.
   RACK_OPTIONS = %i(
@@ -10,6 +11,7 @@ class BubBot::Configuration
     slack_url
     servers
     bot_oauth_token
+    bot_name
   )
 
   OPTIONS = RACK_OPTIONS + BUB_BOT_OPTIONS

@@ -8,6 +8,10 @@ class BubBot::Slack::CommandParser
   def self.get_command(string_input)
     puts "Parsing #{string_input}"
     puts "options: #{command_classes}"
+
+    # Strip the bot name out
+    string_input.sub!(/^#{BubBot.configuration.bot_name} /, '')
+
     command = string_input.split(' ').first
 
     if command
