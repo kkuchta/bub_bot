@@ -23,10 +23,23 @@ Slack setup:
   - We'll want a shorthand for deploying the same branch to both (`bub deploy burrito kk_small_fixes to both`). Or maybe not.
   - If you leave one off, does it deploy develop, or maybe it doesn't deploy to that branch at all?  eg `bub deploy kk_small_fixes to web`
 
-Brain dump for the next time I pick this up:
-- Ok, take command works with hardcoded values.  Let's set up the command parsing.
-- Got a cool parsing system in place- still fleshing it out.
-- Need to come up with a system that catches exceptions thrown by commands and prints
-  the results.  Maybe Command.safe_run is what webserver calls, which wraps run
-  in a begin-rescue.
+# Deploy
+- Deploy implicitly takes the server
+- `bub deploy cannoli kk_some_change` deploys that branch to both servers on cannoli
+  - if that branch is found in both core and web, deploy it
+  - if it's found in only one, deploy it there and deploy develop in the other
+- `bub deploy cannoli core kk_foo web kk_bar`
+  - deploy branches to servers
+  - try to accept 'kk_foo to core', 'kk_foo on core', 'core kk_foo'
+  - ignore commas and 'and'
+- `bub deploy cannoli core kk_foo`
+  - if only one target specified, I guess deploy default branch to the other
+  - I suppose we want to always deploy to all systems so it's not in a surprising state
+    - Maybe support `none` or `skip` as a branch if we want to explicitly skip deploying to it.
+- `bub deploy core kk_foo`
+  - Takes and deploys to the first available server
+  - We *could* have this deploy to any server you already have claimed instead, I guess
+    - Seems like that could be surprising (in a bad way)
+    - Maybe only do that if you have only one server claimed?
+    - I dunno, still seems kinda sketch
 

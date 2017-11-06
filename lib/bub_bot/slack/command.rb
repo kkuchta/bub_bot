@@ -1,4 +1,5 @@
 require 'bub_bot/server_manager.rb'
+require 'bub_bot/deploy_manager.rb'
 require 'slack-ruby-client'
 
 class BubBot::Slack::Command
@@ -25,6 +26,10 @@ class BubBot::Slack::Command
 
   def servers
     @@servers ||= BubBot::ServerManager.new
+  end
+
+  def deployer
+    @@deployer ||= BubBot::DeployManager.new
   end
 
   def client

@@ -12,6 +12,7 @@ class BubBot::Configuration
     servers
     bot_oauth_token
     bot_name
+    deploy_targets
   )
 
   OPTIONS = RACK_OPTIONS + BUB_BOT_OPTIONS
@@ -22,6 +23,12 @@ class BubBot::Configuration
     RACK_OPTIONS.each_with_object({}) do |option_name, options_hash|
       options_hash[option_name] = public_send(option_name)
     end
+  end
+
+  def verify_options
+    # TODO: verify that deploy_targets, etc, are formatted correctly and print
+    # useful error messages otherwise.
+    true
   end
 
 end
