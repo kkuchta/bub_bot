@@ -1,3 +1,5 @@
+This is a running log of whatever I was thinking when I stopped work for the day.
+
 Brain dump for the next time I pick this up:
 - Ok, `take` works.  There's a nice litle parsing system for flexible command parsing.
 - We've got a custom error class that, if thrown, prints the error message to slack too.

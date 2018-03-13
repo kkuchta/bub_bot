@@ -12,7 +12,14 @@ end
 
 class BubBot::WebServer
   def call(env)
-    puts 'got something'
+    puts ' --- Got request ---'
+
+    # Ignore retries for now.
+    if env['HTTP_X_SLACK_RETRY_NUM']
+      puts "Ignoring retry: #{env['HTTP_X_SLACK_RETRY_NUM']}, because #{env['HTTP_X_SLACK_RETRY_REASON']}"
+      return [200, {}, ['ok']]
+    end
+
     request = Rack::Request.new(env)
 
     # For easily checking if the server's up
@@ -27,7 +34,6 @@ class BubBot::WebServer
       event = params[:event]
 
       # Skip messages from bots
-        
       return [200, {}, []] if event[:subtype] == 'bot_message'
 
       # Make sure this is in the form of 'bub foo'
@@ -38,20 +44,24 @@ class BubBot::WebServer
 
       command = BubBot::Slack::CommandParser.get_command(event[:text])
 
-      puts "Running command #{command}"
+      puts " --- Running command #{command}"
 
-      response =
-        begin
-          if command
-            command.new(event).run
-          else
-            BubBot::Slack::Response.new("unknown command")
+      # Slack will retry any message that takes longer than 3 seconds to complete,
+      # so do all message processing in a thread.
+      Thread.new do
+        response =
+          begin
+            if command
+              command.new(event).run
+            else
+              BubBot::Slack::Response.new("unknown command")
+            end
+          rescue RespondableError => e
+            BubBot::Slack::Response.new(e.message)
           end
-        rescue RespondableError => e
-          BubBot::Slack::Response.new(e.message)
-        end
 
-      response.deliver
+        response.deliver
+      end
 
       return [200, {}, []]
 

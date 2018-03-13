@@ -1,0 +1,66 @@
+# Ok, slack's apis + integrations are a big mess.  This was much simpler a few
+# years ago.  Some learnings:
+#
+# - Distributing as a slack app isn't going to work.  That seems built around
+#   externally-hosted servers.  You get the web-api credentials during this
+#   oauth-like flow that happens when a team clicks the "add app" button.
+# - Wait!  No!  In the app config, under "Add features + functionality"
+#   > Permissions > Bot User OAuth Access Token, there's a bot user oauth token
+#   that seems to work for accessing the web api.
+#
+
+# From outgoing hook (maybe nolonger needed
+slack_token: foo
+
+# This is instal
+# From incoming hook (probably no longer necessary—use the web api instead)
+slack_url: https://hooks.slack.com/services/bar
+
+redis_host: localhost:6379
+
+bot_name: bub
+
+# Rack options
+Port: 65222
+
+#--- probably not needed ---
+
+# May not be needed.  probably wrong
+oauth_token: some_token
+
+# Bot oauth token
+bot_oauth_token: another_token
+
+# H'ok, so:
+# deploy_targets lists each codebase.  Deploy defines how to deploy.  Any string
+# in here will get run through erb.  Some parameters that will be provided to erb
+# are:
+#  - server
+#  - branch
+#
+# deploy types are:
+#  - script (just some local script to run)
+#  - git (a git remote to push to)
+#  - http (some web callback to hit)
+
+deploy_targets:
+  core:
+    git: 'git@github.com:Foo/bar.git'
+    deploy:
+      git: 'git@some-host.com:Foo-<%=server %>/mypro-rails.git'
+    default_branch: develop
+  web:
+    git: 'git@github.com:Foo/web.git'
+    # Takes as params the branch to deploy and the server to deploy to
+    deploy:
+      script: 'deploy_web.sh'
+    default_branch: develop
+  all:
+    after:
+      message: 'Done deploying <%= branch %> to <%= server %>' # Err, should this be each:?
+
+servers:
+  - cannoli
+  - hotdog
+  - burrito
+  - gyro

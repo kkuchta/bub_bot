@@ -1,4 +1,5 @@
-require 'redis'
+require 'bub_bot/redis_connection'
+
 class BubBot::ServerManager
   ROOT_KEY = 'bub_server_list'.freeze
 
@@ -54,7 +55,6 @@ class BubBot::ServerManager
   end
 
   def redis
-    # TODO: pull from config
-    @redis ||= Redis.new(url: 'redis://localhost:6379')
+    BubBot::RedisConnection.instance
   end
 end

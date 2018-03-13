@@ -7,7 +7,7 @@ Dir[File.dirname(__FILE__) + '/commands/*.rb'].each {|file| require file }
 class BubBot::Slack::CommandParser
   def self.get_command(string_input)
     puts "Parsing #{string_input}"
-    puts "options: #{command_classes}"
+    #puts "options: #{command_classes}"
 
     # Strip the bot name out
     string_input.sub!(/^#{BubBot.configuration.bot_name} /, '')

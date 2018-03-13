@@ -32,29 +32,27 @@ class Repo
     @_git
   end
 
-  def push(branch, remote)
+  # Push is async
+  def push(branch, remote, &on_complete)
     # TODO: handle people pushing while another push is still going, since we
     # have some shared state in the form of the filesystem
 
     puts 'Pushing'
-    Thread.new do
-      puts 'in thread'
-      git.remotes.find{ |remote| remote.name == 'push_remote' }&.remove
-      puts 'Maybe removed old remote'
+    git.remotes.find{ |remote| remote.name == 'push_remote' }&.remove
+    puts 'Maybe removed old remote'
 
-      git.add_remote('push_remote', remote)
-      puts 'added remote'
+    git.add_remote('push_remote', remote)
+    puts 'added remote'
 
-      Kernel.system("cd #{repo_dir}; git remote set-branches --add origin '#{branch}'")
-      puts "Would have pushed #{branch} to #{remote}"
+    Kernel.system("cd #{repo_dir}; git remote set-branches --add origin '#{branch}'")
+    puts "Pushing #{branch} to #{remote}"
 
-      puts "about to git fetch origin for branch #{branch}"
-      git.fetch('origin', branch: branch)
-      puts 'about to finally push'
-      git.push(remote, "+origin/#{branch}:master")
-      puts 'Finished final push'
-    end
-    # TODO
+    puts "about to git fetch origin for branch #{branch}"
+    git.fetch('origin', branch: branch)
+    puts 'about to finally push'
+    git.push(remote, "+origin/#{branch}:master")
+    puts 'Finished final push'
+    on_complete.call if on_complete
   end
 
   def clean
