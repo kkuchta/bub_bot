@@ -3,15 +3,13 @@ require 'bub_bot/redis_connection'
 require 'erb'
 
 class BubBot::DeployManager
-  ROOT_KEY = 'bub_deploy_status'.freeze
   def deploy(server, target_name, branch)
-    set_deploying(server, false) # TEMPORARY
-    if deploying?(server)
-      raise RespondableError.new("A deploy to #{server} is already in progress.")
+    if DeployState[server, target_name].deploying?
+      raise RespondableError.new("A deploy to #{target_name} on #{server} is already in progress.")
     end
 
     begin
-      set_deploying(server, true)
+      DeployState[server, target_name].set(true)
       target_config = target(target_name)
 
       unless deploy_config = target_config['deploy']
@@ -34,19 +32,20 @@ class BubBot::DeployManager
         puts "Checking out..."
         repo.checkout(branch)
         puts "Pulling..."
-        #binding.pry
         repo.pull
         puts "Running script..."
         success = Kernel.system("./#{deploy_script} #{repo.repo_dir} #{branch} #{server}")
         puts "Success = #{success}"
         unless success
-          raise RespondableError.new('Script deploys arent supported yet; blame kevin')
+          raise RespondableError.new("Deploy script failed for server #{server} and target #{target_name}")
         end
+      elsif deploy_url = deploy_config['http']
+        raise RespondableError.new('Sorry, deploys by http request are not supported yet')
       end
 
-      set_deploying(server, false)
+      DeployState[server, target_name].set(false)
     rescue
-      set_deploying(server, false)
+      DeployState[server, target_name].set(false)
       raise
     end
   end
@@ -60,26 +59,6 @@ class BubBot::DeployManager
   end
 
   private
-
-  def set_deploying(server, is_deploying)
-    puts "set deploying to #{is_deploying} for #{server}"
-    if is_deploying
-      redis.hset(ROOT_KEY, server, Time.now)
-    else
-      redis.hdel(ROOT_KEY, server)
-    end
-  end
-
-  def deploying?(server)
-    deployed_at = redis.hget(ROOT_KEY, server)
-    # If we have a super-old deployed_at, assume something went wrong in the
-    # deploy and we failed to capture that.
-    return deployed_at && Time.parse(deployed_at) > 30.minutes.ago
-  end
-
-  def redis
-    BubBot::RedisConnection.instance
-  end
 
   def repo(target_name, server)
     @repos ||= {}
@@ -95,16 +74,58 @@ class BubBot::DeployManager
   def targets
     BubBot.configuration.deploy_targets
   end
+
+  # Gets a binding object with the given variables defined in it.  You'd *think*
+  # there'd be a simpler way.  Well, ok, there is, but there's no simpler way that
+  # doesn't *also* polute the binding with variables from the outer scope.
+  def get_binding(variables)
+    obj = Class.new {
+      attr_accessor *variables.keys
+      def get_binding(); binding end
+    }.new
+    variables.each { |name, value| obj.public_send(:"#{name}=", value) }
+    obj.get_binding
+  end
 end
 
-# Gets a binding object with the given variables defined in it.  You'd *think*
-# there'd be a simpler way.  Well, ok, there is, but there's no simpler way that
-# doesn't *also* polute the binding with variables from the outer scope.
-def get_binding(variables)
-  obj = Class.new {
-    attr_accessor *variables.keys
-    def get_binding(); binding end
-  }.new
-  variables.each { |name, value| obj.public_send(:"#{name}=", value) }
-  obj.get_binding
+class DeployState
+  ROOT_KEY = 'bub_deploy_status'.freeze
+
+  def self.[](server, target)
+    (@_deploy_states ||= {})[key(server, target)] ||= DeployState.new(server, target)
+  end
+
+  def self.key(server, target)
+    "#{server}__#{target}"
+  end
+
+  def initialize(server, target)
+    @server = server
+    @target = target
+  end
+
+  def key
+    self.class.key(@server, @target)
+  end
+
+  def deploying?
+    deployed_at = redis.hget(ROOT_KEY, key)
+
+    # If we have a super-old deployed_at, assume something went wrong in the
+    # deploy and we failed to capture that.
+    return deployed_at && Time.parse(deployed_at) > 30.minutes.ago
+  end
+
+  def set(is_deploying)
+    puts "set deploying to #{is_deploying} for #{key}"
+    if is_deploying
+      redis.hset(ROOT_KEY, key, Time.now)
+    else
+      redis.hdel(ROOT_KEY, key)
+    end
+  end
+
+  def redis
+    BubBot::RedisConnection.instance
+  end
 end

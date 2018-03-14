@@ -68,13 +68,16 @@ class BubBot::Slack::Command::Deploy < BubBot::Slack::Command
 
     # TODO: err if no deploys found?
 
-    response = "Deploying on server #{server}"
+    message_segments = deploys.map do |target, branch|
+      "branch '#{branch}' to target '#{target}'"
+    end
+    respond("Deploying on server #{server}: #{message_segments.join('; ')}").deliver
+
     deploys.each do |target, branch|
-      response << " branch '#{branch}' to target '#{target}';"
       deployer.deploy(server, target, branch)
     end
 
-    respond(response)
+    respond("Finished deploying on server #{server}: #{message_segments.join('; ')}");
   end
 
   # All known branches for the given target.  Returns all branches for *all*
