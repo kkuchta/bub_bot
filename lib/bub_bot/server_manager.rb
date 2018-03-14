@@ -21,7 +21,11 @@ class BubBot::ServerManager
     }
     redis.hset(ROOT_KEY, server_name, data.to_json)
 
-    puts 'done takin'
+    data.merge(server: server_name)
+  end
+
+  def release(server_name)
+    redis.hdel(ROOT_KEY, server_name)
   end
 
   def names
@@ -36,16 +40,28 @@ class BubBot::ServerManager
         if claim = claims[server_name]
           claim_data = JSON.parse(claim)
           expires_at = DateTime.parse(claim_data['expires_at'])
-          claim_data['expires_at'] = expires_at < Time.now ? nil : expires_at
-          claim_data
+
+          # Filter out expired claims
+          if expires_at > Time.now
+            claim_data['expires_at'] = expires_at
+            claim_data
+          else
+            {}
+          end
         else
           {}
         end
     end
   end
 
+  def claimed_by(username)
+    list
+      .select { |server, claim_data| claim_data['user'] == username }
+      .keys
+  end
+
   def first_unclaimed
-    list.key(nil)
+    list.key({})
   end
 
   private

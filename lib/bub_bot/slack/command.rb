@@ -78,6 +78,9 @@ class BubBot::Slack::Command
   #     order(food_type, when)
   #   end
   # end
+  #
+  # Warning: don't use to_a on this iterator - it'll result in an infinite loop.
+  # In retrospect, this was a bad pattern.  TODO: refactor this.
   def create_token_iterator
     unsafe_iterator = tokens.each
 

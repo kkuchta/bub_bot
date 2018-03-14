@@ -1,4 +1,8 @@
+require 'action_view'
+require 'action_view/helpers'
+
 class BubBot::Slack::Command::Claim < BubBot::Slack::Command
+  include ActionView::Helpers::DateHelper
 
   DEFAULT_DURATION = 1.hour.freeze
   INCREMENTS = %w(minute hour day week month)
@@ -10,9 +14,6 @@ class BubBot::Slack::Command::Claim < BubBot::Slack::Command
 
   def run
     server = duration = deploy = nil
-
-    # This pattern is the new hotness.  Stuff below is wrong.  Haven't tested
-    # in a while so create_token_iterator probably has a bug or two.
     iterator = create_token_iterator
 
     # Skip the command name itself
@@ -31,7 +32,7 @@ class BubBot::Slack::Command::Claim < BubBot::Slack::Command
         server = iterator.next
       elsif token == 'deploy'
         puts 'got deploy'
-        return respond('deploy not yet supported')
+        raise RespondableError.new('Use the new deploy command to deploy, not the take command.')
       else
         raise RespondableError.new("I'm not sure what '#{token}' means.")
       end
@@ -55,7 +56,8 @@ class BubBot::Slack::Command::Claim < BubBot::Slack::Command
 
     result = servers.take(take_options)
 
-    respond('Tookin!')
+    time_ago = time_ago_in_words(result['expires_at'])
+    respond("#{source_user_name} has #{server} for the next #{time_ago}")
   end
 
   private
