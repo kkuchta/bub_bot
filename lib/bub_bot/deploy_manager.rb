@@ -27,10 +27,10 @@ class BubBot::DeployManager
       # workaround to do that is to just have a script-type deploy that does that.
       if deploy_git_remote = deploy_config['git']
         deploy_git_remote = ERB.new(deploy_git_remote).result(get_binding(locals))
-        repo(target_name).push(branch, deploy_git_remote)
+        repo(target_name, server).push(branch, deploy_git_remote)
       elsif deploy_script = deploy_config['script']
         puts "xdeploying web script #{deploy_script}"
-        repo = repo(target_name)
+        repo = repo(target_name, server)
         puts "Checking out..."
         repo.checkout(branch)
         puts "Pulling..."
@@ -56,7 +56,7 @@ class BubBot::DeployManager
   end
 
   def branches(target_name)
-    repo(target_name).branches
+    Repo.branches(target(target_name)['git'])
   end
 
   private
@@ -81,10 +81,10 @@ class BubBot::DeployManager
     BubBot::RedisConnection.instance
   end
 
-  def repo(target_name)
+  def repo(target_name, server)
     @repos ||= {}
-    target = targets.find { |name, _| name == target_name }.last
-    @repos[target_name] ||= Repo.new(target_name, target['git'])
+    target = target(target_name)
+    @repos[target_name + '__' + server] ||= Repo.new(target_name, target['git'], server)
   end
 
   # Returns a hash of config data for the target with this name
