@@ -48,7 +48,7 @@ class BubBot::WebServer
 
       # Slack will retry any message that takes longer than 3 seconds to complete,
       # so do all message processing in a thread.
-      Thread.new do
+      command_thread = Thread.new do
         response =
           begin
             if command
@@ -62,6 +62,7 @@ class BubBot::WebServer
 
         response.deliver
       end
+      command_thread.abort_on_exception = true
 
       return [200, {}, []]
 

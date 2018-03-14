@@ -25,10 +25,10 @@ class Repo
       @_git = Git.open(repo_dir)
       # TODO: handle other errors beside "dir doesn't exist"
     else
-      @_git = Git.clone(@origin_remote, @name, path: dir, depth: 1)
+      puts "Cloning repo"
+      @_git = Git.clone(@origin_remote, @name, path: dir, depth: 1, :log => Logger.new(STDOUT))
       puts 'here'
     end
-    # TODO clone + return a git object
     @_git
   end
 
@@ -57,16 +57,40 @@ class Repo
 
   def clean
     # TODO: make sure there's no weird changes on the git repo
+    git.clean(force: true)
+    git.reset_hard
   end
 
   def fetch
     git.fetch
   end
 
+  def checkout(branch_name)
+    clean
+    cmd("remote set-branches origin '*'")
+    fetch
+    git.checkout(branch_name)
+  end
+
+  def pull
+    git.pull
+  end
+
   def repo_dir
     "#{dir}/#{@name}"
   end
+
   def dir
     "/tmp/bub_repos"
+  end
+
+  private
+
+  # The git library doesn't support everything, so sometimes we run arbitrary commands.
+  def cmd(command)
+    git_command = "git --git-dir=#{repo_dir}/.git --work-tree=#{repo_dir} #{command}"
+    puts "Running #{git_command}"
+    result = Kernel.system(git_command)
+    puts "Result=#{result}"
   end
 end

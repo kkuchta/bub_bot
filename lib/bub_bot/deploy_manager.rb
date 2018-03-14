@@ -5,6 +5,7 @@ require 'erb'
 class BubBot::DeployManager
   ROOT_KEY = 'bub_deploy_status'.freeze
   def deploy(server, target_name, branch)
+    set_deploying(server, false) # TEMPORARY
     if deploying?(server)
       raise RespondableError.new("A deploy to #{server} is already in progress.")
     end
@@ -27,13 +28,23 @@ class BubBot::DeployManager
       if deploy_git_remote = deploy_config['git']
         deploy_git_remote = ERB.new(deploy_git_remote).result(get_binding(locals))
         repo(target_name).push(branch, deploy_git_remote)
-        set_deploying(server, false)
       elsif deploy_script = deploy_config['script']
-        # TODO
-        raise RespondableError.new('Script deploys arent supported yet; blame kevin')
+        puts "xdeploying web script #{deploy_script}"
+        repo = repo(target_name)
+        puts "Checking out..."
+        repo.checkout(branch)
+        puts "Pulling..."
+        #binding.pry
+        repo.pull
+        puts "Running script..."
+        success = Kernel.system("./#{deploy_script} #{repo.repo_dir} #{branch} #{server}")
+        puts "Success = #{success}"
+        unless success
+          raise RespondableError.new('Script deploys arent supported yet; blame kevin')
+        end
       end
 
-      puts 'deploying'
+      set_deploying(server, false)
     rescue
       set_deploying(server, false)
       raise
