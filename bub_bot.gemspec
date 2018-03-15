@@ -10,7 +10,6 @@ Gem::Specification.new do |spec|
   spec.email         = ["kevin@kevinkuchta.com"]
 
   spec.summary       = %q{A little server reservation and deploy bot for heroku and aptible}
-  #spec.description   = %q{TODO: Write a longer description or delete this line.}
   spec.homepage      = "https://github.com/kkuchta/bub_bot"
   spec.license       = "MIT"
 
