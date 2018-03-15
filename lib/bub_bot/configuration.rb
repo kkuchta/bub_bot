@@ -3,6 +3,7 @@ class BubBot::Configuration
   # Any of these options will be passed on to rack, rather than handled by us.
   RACK_OPTIONS = %i(
     Port
+    Host
   )
 
   # These options will be handled by us.
