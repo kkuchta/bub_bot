@@ -3,9 +3,12 @@ require 'bub_bot/version'
 require 'bub_bot/web_server'
 require 'bub_bot/configuration'
 require 'bub_bot/cli'
-require 'pry-byebug'
 require 'active_support'
 require 'active_support/core_ext'
+
+if ENV['RACK_ENV'] == 'development'
+  require 'pry-byebug'
+end
 
 module BubBot
   class << self
