@@ -8,6 +8,7 @@ require 'active_support/core_ext'
 
 if ENV['RACK_ENV'] == 'development'
   require 'pry-byebug'
+  require 'dotenv/load'
 end
 
 module BubBot

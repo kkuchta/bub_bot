@@ -10,7 +10,7 @@ class BubBot::DeployManager
 
     begin
       DeployState[server, target_name].set(true)
-      target_config = target(target_name)
+      target_config = target(target_name, server)
 
       unless deploy_config = target_config['deploy']
         raise "Missing deploy config for #{target_name}"
@@ -24,7 +24,6 @@ class BubBot::DeployManager
       # TODO: maybe handle multiple deploys for each target?  Right now the
       # workaround to do that is to just have a script-type deploy that does that.
       if deploy_git_remote = deploy_config['git']
-        deploy_git_remote = ERB.new(deploy_git_remote).result(get_binding(locals))
         repo(target_name, server).push(branch, deploy_git_remote)
       elsif deploy_script = deploy_config['script']
         puts "xdeploying web script #{deploy_script}"
@@ -42,11 +41,8 @@ class BubBot::DeployManager
       elsif deploy_url = deploy_config['http']
         raise RespondableError.new('Sorry, deploys by http request are not supported yet')
       end
-
+    ensure
       DeployState[server, target_name].set(false)
-    rescue
-      DeployState[server, target_name].set(false)
-      raise
     end
   end
 
@@ -62,17 +58,17 @@ class BubBot::DeployManager
 
   def repo(target_name, server)
     @repos ||= {}
-    target = target(target_name)
+    target = target(target_name, server)
     @repos[target_name + '__' + server] ||= Repo.new(target_name, target['git'], server)
   end
 
   # Returns a hash of config data for the target with this name
-  def target(target_name)
-    targets.find { |name, _| name == target_name }.last
+  def target(target_name, server = nil)
+    targets(server).find { |name, _| name == target_name }.last
   end
 
-  def targets
-    BubBot.configuration.deploy_targets
+  def targets(server = nil)
+    BubBot.configuration.deploy_targets(server: server)
   end
 
   # Gets a binding object with the given variables defined in it.  You'd *think*
