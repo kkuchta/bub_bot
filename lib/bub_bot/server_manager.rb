@@ -6,7 +6,7 @@ class BubBot::ServerManager
   # Options:
   # - duration (1.hour)
   # - server_name (cannoli)
-  # - username (kevin)
+  # - user (kevin)
   #
   # All options required.  Do your own defaulting, you lazy bum!
   def take(options)

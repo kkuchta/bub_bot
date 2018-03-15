@@ -53,6 +53,7 @@ class BubBot::Slack::Command::Deploy < BubBot::Slack::Command
     # Validate all the potential deploys before we start
     deploys.each do |target, branch|
       puts 'deploys.each'
+      # TODO: infer targets, etc
       unless targets.include?(target)
         raise RespondableError.new("Unknown deploy target #{token}. Try one of #{targets.join(', ')}")
       end
@@ -61,12 +62,34 @@ class BubBot::Slack::Command::Deploy < BubBot::Slack::Command
       end
     end
 
+    server = servers.first_unclaimed unless server
+
+    unless server
+      return respond('No servers available')
+    end
+
+    unless deploys.any?
+      return respond("Please specify a target and a branch, eg `bub deploy #{server} core kk_add_lasers`");
+    end
+
     # TODO:
-    # - default to open server
-    # - skip
     # - default to deploying develop
 
-    # TODO: err if no deploys found?
+    claim_data = servers.list[server]
+
+    if claim_data['user'] && claim_data['user'] != source_user_name
+      raise RespondableError.new("Server already claimed by #{claim_data['user']}.  Use the 'take' command first to override their claim.")
+    elsif
+      # Extend our current claim on this server to 1 hour from now unless we
+      # already have it claimed for longer
+      if !claim_data['expires_at'] || claim_data['expires_at'] < 1.hour.from_now
+        servers.take(
+          user: source_user_name,
+          duration: 1.hour,
+          server_name: server
+        )
+      end
+    end
 
     message_segments = deploys.map do |target, branch|
       "branch '#{branch}' to target '#{target}'"
