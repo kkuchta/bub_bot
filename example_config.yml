@@ -9,13 +9,6 @@
 #   that seems to work for accessing the web api.
 #
 
-# From outgoing hook (maybe nolonger needed
-slack_token: foo
-
-# This is instal
-# From incoming hook (probably no longer necessary—use the web api instead)
-slack_url: https://hooks.slack.com/services/bar
-
 redis_host: localhost:6379
 
 bot_name: bub
@@ -23,13 +16,10 @@ bot_name: bub
 # Rack options
 Port: 65222
 
-#--- probably not needed ---
-
-# May not be needed.  probably wrong
-oauth_token: some_token
-
 # Bot oauth token
-bot_oauth_token: another_token
+bot_oauth_token: abcd-123456
+
+slack_channel: general
 
 # H'ok, so:
 # deploy_targets lists each codebase.  Deploy defines how to deploy.  Any string
@@ -39,28 +29,28 @@ bot_oauth_token: another_token
 #  - branch
 #
 # deploy types are:
-#  - script (just some local script to run)
+#  - script (just some local script to run; should be in git repo?)
 #  - git (a git remote to push to)
 #  - http (some web callback to hit)
 
 deploy_targets:
   core:
-    git: 'git@github.com:Foo/bar.git'
+    git: 'git@github.com:MyCo/foo.git'
     deploy:
-      git: 'git@some-host.com:Foo-<%=server %>/mypro-rails.git'
-    default_branch: develop
+      git: 'git@beta.aptible.com:myco-<%=server %>/foo-rails.git'
+    #default_branch: develop - TODO not yet supported
   web:
-    git: 'git@github.com:Foo/web.git'
-    # Takes as params the branch to deploy and the server to deploy to
+    git: 'git@github.com:MyCo/web.git'
+
+    # Script params: repo_dir, branch, server to deploy to
+    # (repo should already be on the right branch)
     deploy:
       script: 'deploy_web.sh'
-    default_branch: develop
-  all:
-    after:
-      message: 'Done deploying <%= branch %> to <%= server %>' # Err, should this be each:?
+    #default_branch: develop - TODO not yet supported
 
 servers:
-  - cannoli
-  - hotdog
+  #- cannoli
+  #- hotdog
   - burrito
   - gyro
+

@@ -33,7 +33,7 @@ class BubBot::Slack::Command
   end
 
   def client
-    @@client ||= Slack::Web::Client.new(token: BubBot.configuration.bot_oauth_token)
+    BubBot::Slack::Client.instance
   end
 
   def source_user_id
@@ -51,7 +51,11 @@ class BubBot::Slack::Command
 
   # Takes either a string or some options
   def respond(options)
-    BubBot::Slack::Response.new(options)
+    BubBot::Slack::Response.new(options, client)
+  end
+
+  def bot_name
+    BubBot.configuration.bot_name
   end
 
   # Returns an iterator over the token list that returns nil when out of tokens.

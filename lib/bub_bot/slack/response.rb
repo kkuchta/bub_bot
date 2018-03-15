@@ -1,17 +1,21 @@
-require 'faraday'
-
 class BubBot::Slack::Response
   attr_accessor :text
 
-  def initialize(options)
+  def initialize(options, client)
     @text = options.is_a?(String) ? options : options[:text]
+    @client = client
   end
 
   def deliver
     body = {
       text: text,
-      username: 'bub'
+      username: BubBot.configuration.bot_name
     }
-    Faraday.post(BubBot.configuration.slack_url, body.to_json)
+    # TODO: configure channel
+    @client.chat_postMessage(channel: '#' + channel, text: text, as_user: true)
+  end
+
+  def channel
+    BubBot.configuration.slack_channel
   end
 end

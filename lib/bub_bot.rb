@@ -7,7 +7,6 @@ require 'pry-byebug'
 require 'active_support'
 require 'active_support/core_ext'
 
-
 module BubBot
   class << self
     attr_accessor :configuration
@@ -23,7 +22,7 @@ module BubBot
     # This method starts a listening web server.  Call from the cli or wherever
     # else you want to kick off a running BubBot process.
     def start
-      puts "Booting BubBot, slack_token = #{BubBot.configuration.slack_token}"
+      puts 'Booting BubBot'
       Thread.new do
         loop do
           #puts "Checking for servers to shutdown"

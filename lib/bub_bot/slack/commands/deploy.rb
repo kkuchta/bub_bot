@@ -69,7 +69,7 @@ class BubBot::Slack::Command::Deploy < BubBot::Slack::Command
     end
 
     unless deploys.any?
-      return respond("Please specify a target and a branch, eg `bub deploy #{server} core kk_add_lasers`");
+      return respond("Please specify a target and a branch, eg `#{bot_name} deploy #{server} core kk_add_lasers`");
     end
 
     # TODO:

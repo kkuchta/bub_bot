@@ -11,6 +11,6 @@ class BubBot::RedisConnection
     redis.respond_to?(method) ? redis.public_send(method, *args, &block) : super
   end
   def redis
-    @redis ||= Redis.new(url: 'redis://localhost:6379')
+    @redis ||= Redis.new(url: 'redis://' + BubBot.configuration.redis_host)
   end
 end

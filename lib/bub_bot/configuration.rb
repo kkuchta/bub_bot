@@ -7,12 +7,12 @@ class BubBot::Configuration
 
   # These options will be handled by us.
   BUB_BOT_OPTIONS = %i(
-    slack_token
-    slack_url
     servers
     bot_oauth_token
     bot_name
     deploy_targets
+    slack_channel
+    redis_host
   )
 
   OPTIONS = RACK_OPTIONS + BUB_BOT_OPTIONS

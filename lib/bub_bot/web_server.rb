@@ -1,5 +1,6 @@
 require 'bub_bot/slack/command_parser'
 require 'bub_bot/slack/response'
+require 'bub_bot/slack/client'
 require 'faraday'
 
 class BubError < StandardError
@@ -54,10 +55,10 @@ class BubBot::WebServer
             if command
               command.new(event).run
             else
-              BubBot::Slack::Response.new("unknown command")
+              BubBot::Slack::Response.new("unknown command", slack_client)
             end
           rescue RespondableError => e
-            BubBot::Slack::Response.new(e.message)
+            BubBot::Slack::Response.new(e.message, slack_client)
           end
 
         response.deliver
@@ -83,5 +84,9 @@ class BubBot::WebServer
   def parse_params(request)
     JSON.parse(request.body.read)
       .with_indifferent_access
+  end
+
+  def slack_client
+    BubBot::Slack::Client.instance
   end
 end

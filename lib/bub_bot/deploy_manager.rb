@@ -5,7 +5,7 @@ require 'erb'
 class BubBot::DeployManager
   def deploy(server, target_name, branch)
     if DeployState[server, target_name].deploying?
-      raise RespondableError.new("A deploy to #{target_name} on #{server} is already in progress.")
+      raise RespondableError.new("A deploy to #{target_name} on #{server} is already in progress.  Not deploying.")
     end
 
     begin
