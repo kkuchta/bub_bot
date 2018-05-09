@@ -5,10 +5,10 @@ require 'bub_bot/configuration'
 require 'bub_bot/cli'
 require 'active_support'
 require 'active_support/core_ext'
+require 'dotenv/load'
 
 if ENV['RACK_ENV'] == 'development'
   require 'pry-byebug'
-  require 'dotenv/load'
 end
 
 module BubBot

@@ -8,9 +8,13 @@ Use ec2tunnel alias to set up a tunnel (it's already rigged up to slack on the k
 
 Slack setup:
 - Creat an app
+  https://api.slack.com/apps?new_app=1
+  Set the development workspace to your target slack env
 - Add a bot user
+  - Set display name and user name to yoru desired name (eg bub)
 - Add an event subscription
-  - Use the *bot event* for messages.channel
+  - Use the *bot event* for message.channels ("Add Bot User Event")
+  - Set request url to your_host:123/
 - Add an incoming webhook
 <!--- Add event subscription-->
   <!--- Enter hostname (verification should happen automatically now)-->

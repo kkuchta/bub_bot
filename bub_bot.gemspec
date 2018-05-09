@@ -28,11 +28,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'actionview'
   spec.add_dependency "redis"
   spec.add_dependency 'slack-ruby-client'
+  spec.add_dependency "dotenv"
 
   spec.add_development_dependency "bundler", "~> 1.13"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "rspec-mocks", "~> 3.5"
   spec.add_development_dependency "pry-byebug"
-  spec.add_development_dependency "dotenv"
 end
