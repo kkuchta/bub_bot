@@ -53,7 +53,9 @@ class Repo
     puts "Pushing #{branch} to #{remote}"
 
     puts "about to git fetch origin for branch #{branch}"
-    git.fetch('origin', branch: branch)
+    #git.fetch('origin', branch: branch)
+    #Apparently aptible rejects pushes from shallow clones :(
+    cmd('fetch --unshallow origin')
     puts 'about to finally push'
     git.push(remote, "+origin/#{branch}:master")
     puts 'Finished final push'

@@ -47,3 +47,10 @@ Slack setup:
     - Maybe only do that if you have only one server claimed?
     - I dunno, still seems kinda sketch
 
+# Bugs:
+- Show better error when you try to push to a repo you don't have permissions on
+- Tests, of course.
+
+# Features to add:
+- Allow git ssh keys to be passed in at runtime
+- Set up a docker image that people can deploy directly
