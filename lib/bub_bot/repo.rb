@@ -31,7 +31,7 @@ class Repo
       # TODO: handle other errors beside "dir doesn't exist"
     else
       puts "Cloning repo"
-      @_git = Git.clone(@origin_remote, repo_dir_name, path: dir, depth: 1, :log => Logger.new(STDOUT))
+      @_git = Git.clone(@origin_remote, repo_dir_name, path: dir, :log => Logger.new(STDOUT))
       puts 'here'
     end
     @_git
@@ -49,13 +49,10 @@ class Repo
     git.add_remote('push_remote', remote)
     puts 'added remote'
 
-    Kernel.system("cd #{repo_dir}; git remote set-branches --add origin '#{branch}'")
     puts "Pushing #{branch} to #{remote}"
 
     puts "about to git fetch origin for branch #{branch}"
-    #git.fetch('origin', branch: branch)
-    #Apparently aptible rejects pushes from shallow clones :(
-    cmd('fetch --unshallow origin')
+    git.fetch('origin', branch: branch)
     puts 'about to finally push'
     git.push(remote, "+origin/#{branch}:master")
     puts 'Finished final push'
@@ -74,7 +71,7 @@ class Repo
 
   def checkout(branch_name)
     clean
-    cmd("remote set-branches origin '*'")
+    #cmd("remote set-branches origin '*'")
     fetch
     git.checkout(branch_name)
   end

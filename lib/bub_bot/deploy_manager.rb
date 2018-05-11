@@ -33,6 +33,7 @@ class BubBot::DeployManager
         puts "Pulling..."
         repo.pull
         puts "Running script..."
+        # stderr not being captured?  Or, I guess, just not printing output?
         success = Kernel.system("./#{deploy_script} #{repo.repo_dir} #{branch} #{server}")
         puts "Success = #{success}"
         unless success
